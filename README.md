@@ -5,12 +5,12 @@ A mobile app for solar farm field technicians. Built with Expo (React Native) an
 ## Screenshots
 
 <p float="left">
-  <img src="assets/screenshots/home.jpeg" width="18%" />
-  <img src="assets/screenshots/agenda.jpeg" width="18%" />
-  <img src="assets/screenshots/checkin.jpeg" width="18%" />
-  <img src="assets/screenshots/navigation.jpeg" width="18%" />
-  <img src="assets/screenshots/maintenance.jpeg" width="18%" />
-  <img src="assets/screenshots/report.jpeg" width="18%" />
+  <img src="./assets/home.jpeg" width="18%" />
+  <img src="./assets/agenda.jpeg" width="18%" />
+  <img src="./assets/checkin.jpeg" width="18%" />
+  <img src="./assets/navigation.jpeg" width="18%" />
+  <img src="./assets/maintenance.jpeg" width="18%" />
+  <img src="./assets/report.jpeg" width="18%" />
 </p>
 
 ## What it does
