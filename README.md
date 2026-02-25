@@ -2,14 +2,11 @@
 
 A mobile app for solar farm field technicians. Built with Expo (React Native) and TypeScript.
 
+## Demo
+
+https://github.com/user-attachments/assets/2f861043-4dcb-4443-9c1a-38d29ce7730d
+
 ## Screenshots
-
-<div float="center">
-<video src="./assets/demo.mp4" width="400" controls>
-Your browser does not support the video tag.
-</video>
-</div>
-
 <p float="left">
   <img src="./assets/home.jpeg" width="18%" />
   <img src="./assets/agenda.jpeg" width="18%" />
