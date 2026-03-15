@@ -6,6 +6,8 @@ A mobile app for solar farm field technicians. Built with Expo (React Native) an
 
 https://github.com/user-attachments/assets/2f861043-4dcb-4443-9c1a-38d29ce7730d
 
+https://github.com/user-attachments/assets/013bdaf0-2bc3-47c0-a87c-919cc3b3226e
+
 ## Screenshots
 <p float="left">
   <img src="./assets/home.jpeg" width="18%" />
