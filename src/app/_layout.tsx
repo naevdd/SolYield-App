@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { Provider } from "react-redux";
-import { View, StyleSheet } from "react-native";
+import { View } from "react-native";
 import { store } from "@/store";
 import { useNetworkSync } from "@/hooks/useNetworkSync";
 import { SyncBanner } from "@/components/SyncBanner";
@@ -11,7 +11,7 @@ function AppContent() {
   const syncStatus = useNetworkSync();
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
@@ -29,7 +29,3 @@ export default function RootLayout() {
     </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1 },
-});

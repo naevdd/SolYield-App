@@ -14,6 +14,9 @@ https://github.com/user-attachments/assets/2f861043-4dcb-4443-9c1a-38d29ce7730d
   <img src="./assets/navigation.jpeg" width="18%" />
   <img src="./assets/maintenance.jpeg" width="18%" />
   <img src="./assets/report.jpeg" width="18%" />
+  <img src="./assets/sync1.jpeg" widht="18%" />
+  <img src="./assets/sync2.jpeg" widht="18%" />
+  <img src="./assets/sync3.jpeg" widht="18%" />
 </p>
 
 ## What it does
@@ -25,6 +28,9 @@ SolYield gives on-site technicians a single tool to manage their field work acro
 - **Site Navigation** — Interactive map showing all assigned sites (e.g. Bhadla Solar Park, Pavagada Solar Park, Kurnool Ultra Mega Solar Park) with direct navigation launch.
 - **Maintenance Form** — Preventive maintenance checklist covering inverter serial numbers, current generation (kW), panel condition (Clean / Dusty / Bird Droppings / Damaged), wiring integrity, and observed issues.
 - **Report Card** — Per-site performance dashboard with 7-day daily generation chart (kWh) and a performance breakdown (Overperforming / Normal / Underperforming).
+- **The Black Box (Offline Storage)** — Implements local persistence using WatermelonDB to save complex nested form data, ensuring information survives app restarts when the internet is unavailable.
+- **Sync-on-Reconnect** — Automatically detects network restoration and pushes all valid offline forms to the server via background sync.
+- **Visual Evidence** — Resizes and compresses images locally to save space, stores image paths in the offline database, and syncs actual files once online.
 
 ## Tech stack
 

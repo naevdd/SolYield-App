@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { Text, View, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { Text, View, TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Location from "expo-location";
 import { sites } from "@/data/sites";
@@ -32,7 +32,6 @@ export default function CheckIn() {
   const dispatch = useAppDispatch();
   const checkInStatus = useAppSelector((state) => state.checkIn.status);
 
-  // Use first site — in production, derive from today's schedule
   const site = sites[0];
   const siteLocation = {
     name: site.name,
@@ -65,16 +64,10 @@ export default function CheckIn() {
 
       if (distance <= GEOFENCE_RADIUS_M) {
         dispatch(checkInSuccess());
-        Alert.alert(
-          "Checked In!",
-          `You're ${Math.round(distance)}m from ${siteLocation.name}.`
-        );
+        Alert.alert("Checked In!", `You're ${Math.round(distance)}m from ${siteLocation.name}.`);
       } else {
         dispatch(setCheckInStatus("error"));
-        Alert.alert(
-          "Out of Range",
-          `You're ${Math.round(distance)}m away. Must be within ${GEOFENCE_RADIUS_M}m.`
-        );
+        Alert.alert("Out of Range", `You're ${Math.round(distance)}m away. Must be within ${GEOFENCE_RADIUS_M}m.`);
       }
     } catch (e: unknown) {
       dispatch(setCheckInStatus("error"));
@@ -83,156 +76,73 @@ export default function CheckIn() {
     }
   }, [dispatch, site.id, siteLocation]);
 
+  const isLoading = checkInStatus === "loading";
+  const isSuccess = checkInStatus === "success";
+  const isError = checkInStatus === "error";
+
   return (
-    <View style={styles.container}>
-      <View style={styles.siteInfo}>
+    <View className="flex-1 bg-[#F8F9FA] px-5 pt-6">
+      {/* Site Info Card */}
+      <View className="bg-white rounded-2xl p-5 items-center shadow-sm elevation-2">
         <Ionicons name="business-outline" size={24} color="#E67E22" />
-        <Text style={styles.siteName}>{siteLocation.name}</Text>
-        <Text style={styles.coords}>
+        <Text className="text-xl font-bold text-[#1A1A2E] mt-2">{siteLocation.name}</Text>
+        <Text className="text-sm text-gray-400 mt-1">
           {siteLocation.latitude.toFixed(4)}°N, {siteLocation.longitude.toFixed(4)}°E
         </Text>
-        <Text style={styles.radius}>Required: within {GEOFENCE_RADIUS_M}m</Text>
+        <Text className="text-xs text-[#E67E22] font-medium mt-1">
+          Required: within {GEOFENCE_RADIUS_M}m
+        </Text>
       </View>
 
-      <View style={styles.statusContainer}>
-        {checkInStatus === "idle" && (
-          <View style={styles.statusCircle}>
-            <Ionicons name="location-outline" size={48} color="#CCC" />
-            <Text style={styles.statusText}>Tap to check in</Text>
-          </View>
-        )}
-        {checkInStatus === "loading" && (
-          <View style={styles.statusCircle}>
-            <Ionicons name="navigate-outline" size={48} color="#E67E22" />
-            <Text style={styles.statusText}>Verifying location…</Text>
-          </View>
-        )}
-        {checkInStatus === "success" && (
-          <View style={[styles.statusCircle, styles.successCircle]}>
-            <Ionicons name="checkmark-circle" size={64} color="#27AE60" />
-            <Text style={[styles.statusText, styles.successText]}>Checked In!</Text>
-          </View>
-        )}
-        {checkInStatus === "error" && (
-          <View style={[styles.statusCircle, styles.errorCircle]}>
-            <Ionicons name="close-circle" size={64} color="#E74C3C" />
-            <Text style={[styles.statusText, styles.errorText]}>Out of range</Text>
-          </View>
-        )}
+      {/* Status Circle */}
+      <View className="flex-1 justify-center items-center">
+        <View
+          className={`w-44 h-44 rounded-full justify-center items-center border-[3px] ${
+            isSuccess
+              ? "border-[#27AE60] bg-green-50"
+              : isError
+              ? "border-[#E74C3C] bg-red-50"
+              : "border-gray-200 bg-white"
+          }`}
+        >
+          {isSuccess ? (
+            <>
+              <Ionicons name="checkmark-circle" size={64} color="#27AE60" />
+              <Text className="text-sm text-[#27AE60] font-medium mt-2">Checked In!</Text>
+            </>
+          ) : isError ? (
+            <>
+              <Ionicons name="close-circle" size={64} color="#E74C3C" />
+              <Text className="text-sm text-[#E74C3C] font-medium mt-2">Out of range</Text>
+            </>
+          ) : isLoading ? (
+            <>
+              <Ionicons name="navigate-outline" size={48} color="#E67E22" />
+              <Text className="text-sm text-gray-400 font-medium mt-2">Verifying location…</Text>
+            </>
+          ) : (
+            <>
+              <Ionicons name="location-outline" size={48} color="#CCC" />
+              <Text className="text-sm text-gray-400 font-medium mt-2">Tap to check in</Text>
+            </>
+          )}
+        </View>
       </View>
 
+      {/* Button */}
       <TouchableOpacity
-        style={[
-          styles.button,
-          checkInStatus === "loading" && styles.buttonDisabled,
-          checkInStatus === "success" && styles.buttonSuccess,
-        ]}
+        className={`flex-row items-center justify-center gap-2 py-4 rounded-2xl mb-8 ${
+          isSuccess ? "bg-[#27AE60]" : "bg-[#E67E22]"
+        } ${isLoading ? "opacity-60" : ""}`}
         onPress={handleCheckIn}
-        disabled={checkInStatus === "loading" || checkInStatus === "success"}
+        disabled={isLoading || isSuccess}
         activeOpacity={0.7}
       >
-        <Ionicons
-          name={checkInStatus === "success" ? "checkmark" : "location"}
-          size={22}
-          color="#FFF"
-        />
-        <Text style={styles.buttonText}>
-          {checkInStatus === "success" ? "Checked In" : "I'm Here!"}
+        <Ionicons name={isSuccess ? "checkmark" : "location"} size={22} color="#FFF" />
+        <Text className="text-white font-bold text-lg">
+          {isSuccess ? "Checked In" : "I'm Here!"}
         </Text>
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8F9FA",
-    paddingHorizontal: 20,
-    paddingTop: 24,
-  },
-  siteInfo: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 20,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  siteName: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#1A1A2E",
-    marginTop: 8,
-  },
-  coords: {
-    fontSize: 13,
-    color: "#888",
-    marginTop: 4,
-  },
-  radius: {
-    fontSize: 12,
-    color: "#E67E22",
-    marginTop: 4,
-    fontWeight: "500",
-  },
-  statusContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  statusCircle: {
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    backgroundColor: "#FFF",
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 3,
-    borderColor: "#E0E0E0",
-  },
-  successCircle: {
-    borderColor: "#27AE60",
-    backgroundColor: "#27AE6010",
-  },
-  errorCircle: {
-    borderColor: "#E74C3C",
-    backgroundColor: "#E74C3C10",
-  },
-  statusText: {
-    fontSize: 14,
-    color: "#888",
-    marginTop: 8,
-    fontWeight: "500",
-  },
-  successText: {
-    color: "#27AE60",
-  },
-  errorText: {
-    color: "#E74C3C",
-  },
-  button: {
-    backgroundColor: "#E67E22",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingVertical: 16,
-    borderRadius: 14,
-    marginBottom: 30,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonSuccess: {
-    backgroundColor: "#27AE60",
-  },
-  buttonText: {
-    color: "#FFF",
-    fontWeight: "700",
-    fontSize: 18,
-  },
-});

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { Animated, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SyncStatus } from "@/hooks/useNetworkSync";
 
@@ -46,30 +46,14 @@ export function SyncBanner({ status }: { status: SyncStatus }) {
   }[status.state];
 
   return (
-    <Animated.View style={[styles.banner, { backgroundColor: config.bg, opacity }]}>
+    <Animated.View
+      className="absolute top-0 left-0 right-0 flex-row items-center gap-2 px-4 pt-12 pb-2.5 z-50"
+      // backgroundColor must stay inline — dynamic value
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={[{ opacity, backgroundColor: config.bg }]}
+    >
       <Ionicons name={config.icon} size={18} color="#FFF" />
-      <Text style={styles.text}>{config.text}</Text>
+      <Text className="text-white text-sm font-semibold">{config.text}</Text>
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  banner: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    paddingTop: 48, // safe area
-    zIndex: 999,
-  },
-  text: {
-    color: "#FFF",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-});

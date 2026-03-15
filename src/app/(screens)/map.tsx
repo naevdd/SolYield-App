@@ -1,12 +1,5 @@
 import { useRef, useMemo } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Linking,
-  Platform,
-} from "react-native";
+import { Text, View, TouchableOpacity, Linking, Platform } from "react-native";
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from "react-native-maps";
 import { Ionicons } from "@expo/vector-icons";
 import { sites } from "@/data/sites";
@@ -30,19 +23,14 @@ export default function SiteMap() {
     const centerLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
     const deltaLat = Math.max(...lats) - Math.min(...lats) + 2;
     const deltaLng = Math.max(...lngs) - Math.min(...lngs) + 2;
-    return {
-      latitude: centerLat,
-      longitude: centerLng,
-      latitudeDelta: deltaLat,
-      longitudeDelta: deltaLng,
-    };
+    return { latitude: centerLat, longitude: centerLng, latitudeDelta: deltaLat, longitudeDelta: deltaLng };
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1">
       <MapView
         ref={mapRef}
-        style={styles.map}
+        className="flex-1"
         initialRegion={initialRegion}
         provider={Platform.OS === "android" ? PROVIDER_GOOGLE : undefined}
         showsUserLocation
@@ -51,28 +39,23 @@ export default function SiteMap() {
         {sites.map((site: Site) => (
           <Marker
             key={site.id}
-            coordinate={{
-              latitude: site.location.lat,
-              longitude: site.location.lng,
-            }}
+            coordinate={{ latitude: site.location.lat, longitude: site.location.lng }}
             title={site.name}
             description={site.capacity}
           >
             <Callout tooltip>
-              <View style={styles.callout}>
-                <Text style={styles.calloutTitle}>{site.name}</Text>
-                <Text style={styles.calloutCapacity}>{site.capacity}</Text>
-                <Text style={styles.calloutCoords}>
+              <View className="bg-white rounded-xl p-3.5 w-48 shadow-md elevation-4">
+                <Text className="text-base font-bold text-[#1A1A2E] mb-0.5">{site.name}</Text>
+                <Text className="text-xs text-[#27AE60] font-semibold mb-0.5">{site.capacity}</Text>
+                <Text className="text-xs text-gray-400 mb-2.5">
                   {site.location.lat.toFixed(4)}°N, {site.location.lng.toFixed(4)}°E
                 </Text>
                 <TouchableOpacity
-                  style={styles.navButton}
-                  onPress={() =>
-                    openInMaps(site.location.lat, site.location.lng, site.name)
-                  }
+                  className="flex-row bg-[#27AE60] rounded-lg py-1.5 px-3 items-center justify-center gap-1"
+                  onPress={() => openInMaps(site.location.lat, site.location.lng, site.name)}
                 >
                   <Ionicons name="navigate" size={14} color="#FFF" />
-                  <Text style={styles.navButtonText}>Navigate</Text>
+                  <Text className="text-white font-semibold text-sm">Navigate</Text>
                 </TouchableOpacity>
               </View>
             </Callout>
@@ -81,39 +64,30 @@ export default function SiteMap() {
       </MapView>
 
       {/* Site list overlay */}
-      <View style={styles.listOverlay}>
-        <Text style={styles.heading}>
-          {sites.length} Assigned Sites
-        </Text>
+      <View className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl px-5 pt-5 pb-8 shadow-lg elevation-8">
+        <Text className="text-base font-bold text-[#1A1A2E] mb-3">{sites.length} Assigned Sites</Text>
         {sites.map((site: Site) => (
           <TouchableOpacity
             key={site.id}
-            style={styles.siteRow}
+            className="flex-row items-center py-2"
             activeOpacity={0.7}
             onPress={() => {
               mapRef.current?.animateToRegion(
-                {
-                  latitude: site.location.lat,
-                  longitude: site.location.lng,
-                  latitudeDelta: 0.5,
-                  longitudeDelta: 0.5,
-                },
+                { latitude: site.location.lat, longitude: site.location.lng, latitudeDelta: 0.5, longitudeDelta: 0.5 },
                 800
               );
             }}
           >
-            <View style={styles.siteIcon}>
+            <View className="w-8 h-8 rounded-full bg-green-50 justify-center items-center mr-2.5">
               <Ionicons name="location" size={16} color="#27AE60" />
             </View>
-            <View style={styles.siteInfo}>
-              <Text style={styles.siteName}>{site.name}</Text>
-              <Text style={styles.siteCapacity}>{site.capacity}</Text>
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-[#1A1A2E]">{site.name}</Text>
+              <Text className="text-xs text-gray-400">{site.capacity}</Text>
             </View>
             <TouchableOpacity
-              style={styles.navBadge}
-              onPress={() =>
-                openInMaps(site.location.lat, site.location.lng, site.name)
-              }
+              className="w-8 h-8 rounded-full bg-[#27AE60] justify-center items-center"
+              onPress={() => openInMaps(site.location.lat, site.location.lng, site.name)}
             >
               <Ionicons name="navigate" size={14} color="#FFF" />
             </TouchableOpacity>
@@ -123,111 +97,3 @@ export default function SiteMap() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  map: {
-    flex: 1,
-  },
-  callout: {
-    backgroundColor: "#FFF",
-    borderRadius: 12,
-    padding: 14,
-    width: 200,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  calloutTitle: {
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#1A1A2E",
-    marginBottom: 2,
-  },
-  calloutCapacity: {
-    fontSize: 12,
-    color: "#27AE60",
-    fontWeight: "600",
-    marginBottom: 2,
-  },
-  calloutCoords: {
-    fontSize: 11,
-    color: "#888",
-    marginBottom: 10,
-  },
-  navButton: {
-    flexDirection: "row",
-    backgroundColor: "#27AE60",
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 4,
-  },
-  navButtonText: {
-    color: "#FFF",
-    fontWeight: "600",
-    fontSize: 13,
-  },
-  listOverlay: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: "#FFF",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    paddingBottom: 30,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  heading: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1A1A2E",
-    marginBottom: 12,
-  },
-  siteRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 8,
-  },
-  siteIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#27AE6015",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10,
-  },
-  siteInfo: {
-    flex: 1,
-  },
-  siteName: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1A1A2E",
-  },
-  siteCapacity: {
-    fontSize: 12,
-    color: "#888",
-  },
-  navBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#27AE60",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});
