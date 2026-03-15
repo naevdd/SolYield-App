@@ -14,9 +14,9 @@ https://github.com/user-attachments/assets/2f861043-4dcb-4443-9c1a-38d29ce7730d
   <img src="./assets/navigation.jpeg" width="18%" />
   <img src="./assets/maintenance.jpeg" width="18%" />
   <img src="./assets/report.jpeg" width="18%" />
-  <img src="./assets/sync1.jpeg" widht="18%" />
-  <img src="./assets/sync2.jpeg" widht="18%" />
-  <img src="./assets/sync3.jpeg" widht="18%" />
+  <img src="./assets/sync1.jpeg" width="18%" />
+  <img src="./assets/sync2.jpeg" width="18%" />
+  <img src="./assets/sync3.jpeg" width="18%" />
 </p>
 
 ## What it does
