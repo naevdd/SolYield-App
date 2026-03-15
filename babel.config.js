@@ -1,4 +1,3 @@
-// Example for NativeWind v4 / css-interop
 module.exports = function (api) {
   api.cache(true);
   return {

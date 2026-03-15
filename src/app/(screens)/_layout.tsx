@@ -15,6 +15,7 @@ export default function ScreensLayout() {
       <Stack.Screen name="map" options={{ title: "Site Navigation" }} />
       <Stack.Screen name="report" options={{ title: "Report Card" }} />
       <Stack.Screen name="maintenance" options={{ title: "Maintenance Form" }} />
+      <Stack.Screen name="submissions" options={{ title: "Saved Submissions" }} />
     </Stack>
   );
 }

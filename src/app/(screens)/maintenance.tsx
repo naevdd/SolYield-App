@@ -12,10 +12,15 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
+import * as ImageManipulator from "expo-image-manipulator";
 import { formSchema } from "@/data/form_schema";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setFieldValue, resetForm, submitForm } from "@/store/formSlice";
 import type { FormField } from "@/types";
+import { useEffect } from "react";
+import { database } from "@/db";
+import FormSubmission from "@/db/FormSubmission";
+import { useRouter } from "expo-router";
 
 /* ------------------------------------------------------------------ */
 /*  Field renderers                                                    */
@@ -162,12 +167,17 @@ function FileField({ field }: { field: FormField }) {
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
-      quality: 0.8,
+      quality: 1,
       allowsEditing: true,
     });
     if (!result.canceled && result.assets[0]) {
-      setUri(result.assets[0].uri);
-      dispatch(setFieldValue({ fieldId: field.id, value: result.assets[0].uri }));
+      const compressed = await ImageManipulator.manipulateAsync(
+        result.assets[0].uri,
+        [{ resize: { width: 1024 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+      );
+      setUri(compressed.uri);
+      dispatch(setFieldValue({ fieldId: field.id, value: compressed.uri }));
     }
   }, [dispatch, field.id]);
 
@@ -216,12 +226,50 @@ function FileField({ field }: { field: FormField }) {
 /*  Main Maintenance Screen                                            */
 /* ------------------------------------------------------------------ */
 
+function SubmittedScreen({ onReset }: { onReset: () => void }) {
+  const [count, setCount] = useState(0);
+  const router = useRouter();
+
+  useEffect(() => {
+    database.get<FormSubmission>("form_submissions")
+      .query()
+      .fetchCount()
+      .then(setCount);
+  }, []);
+
+  return (
+    <View style={styles.successContainer}>
+      <Ionicons name="checkmark-circle" size={72} color="#27AE60" />
+      <Text style={styles.successTitle}>Saved Offline</Text>
+      <Text style={styles.successBody}>
+        Your checklist has been stored locally and will sync when you're back online.
+      </Text>
+      <Text style={{ color: "#666", marginTop: 8 }}>
+        {count} submission(s) saved locally
+      </Text>
+      <TouchableOpacity style={styles.resetButton} onPress={onReset} activeOpacity={0.7}>
+        <Text style={styles.resetButtonText}>Submit Another</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.resetButton, { backgroundColor: "#4A90D9", marginTop: 12 }]}
+        onPress={() => router.push("/(screens)/submissions")}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.resetButtonText}>View Submissions</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
 export default function Maintenance() {
   const dispatch = useAppDispatch();
   const formValues = useAppSelector((s) => s.form.values);
   const submitted = useAppSelector((s) => s.form.submitted);
 
-  const handleSubmit = useCallback(() => {
+  const saving = useAppSelector((s) => s.form.saving);
+  const error  = useAppSelector((s) => s.form.error);
+
+  const handleSubmit = useCallback(async () => {
     // Simple required-field validation
     const missing: string[] = [];
     for (const section of formSchema.sections) {
@@ -241,8 +289,7 @@ export default function Maintenance() {
       );
       return;
     }
-    dispatch(submitForm());
-    Alert.alert("Success", "Maintenance form submitted successfully!");
+    await dispatch(submitForm());
   }, [dispatch, formValues]);
 
   const handleReset = useCallback(() => {
@@ -250,22 +297,7 @@ export default function Maintenance() {
   }, [dispatch]);
 
   if (submitted) {
-    return (
-      <View style={styles.successContainer}>
-        <Ionicons name="checkmark-circle" size={72} color="#27AE60" />
-        <Text style={styles.successTitle}>Form Submitted!</Text>
-        <Text style={styles.successBody}>
-          Your preventive maintenance checklist has been recorded.
-        </Text>
-        <TouchableOpacity
-          style={styles.resetButton}
-          onPress={handleReset}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.resetButtonText}>Submit Another</Text>
-        </TouchableOpacity>
-      </View>
-    );
+    return <SubmittedScreen onReset={handleReset} />;
   }
 
   return (
@@ -337,13 +369,20 @@ export default function Maintenance() {
 
       {/* Actions */}
       <TouchableOpacity
-        style={styles.submitButton}
+        style={[styles.submitButton, saving && { opacity: 0.6 }]}
         onPress={handleSubmit}
         activeOpacity={0.7}
+        disabled={saving}
       >
         <Ionicons name="send-outline" size={18} color="#FFF" />
-        <Text style={styles.submitText}>Submit Checklist</Text>
+        <Text style={styles.submitText}>{saving ? "Saving..." : "Submit Checklist"}</Text>
       </TouchableOpacity>
+
+      {error && (
+        <Text style={{ color: "#E74C3C", textAlign: "center", marginTop: 8 }}>
+          {error}
+        </Text>
+      )}
 
       <TouchableOpacity
         style={styles.clearButton}
